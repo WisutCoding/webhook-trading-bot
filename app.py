@@ -40,10 +40,10 @@ def webhook():
     df = pd.DataFrame(account_info['balances'])
 
     usdt_info = df.loc[df['asset']== 'USDT']
-    usdt_amount = round(pd.to_numeric(usdt_info['free'].values[0]),2)-0.01
+    usdt_amount = round(pd.to_numeric(usdt_info['free'].values[0]),2)
 
     btc_info = df.loc[df['asset']== 'BTC']
-    btc_amount = round(pd.to_numeric(btc_info['free'].values[0]),4)-0.0001
+    btc_amount = round(pd.to_numeric(btc_info['free'].values[0]),4)
 
     #---------------------------------------------------
     # Data from Webhook
@@ -56,14 +56,15 @@ def webhook():
 
     # BUY/SELL
     order_action = data['strategy']['order_action'].upper() # BUY / SELL
+    symbol = data['ticker']
+    price = data['bar']['close']
     
     if order_action == "BUY":
-        amount = usdt_amount
+        amount = usdt_amount/price
     else:
         amount = btc_amount
 
-    symbol = data['ticker']
-    price = data['bar']['close']
+
 
     print('passphrase : ',data['passphrase'])
     print('time : ',data['time'])
