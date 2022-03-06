@@ -2,7 +2,7 @@ import json
 import config
 # import ccxt
 
-from flask import Flask, request
+from flask import Flask, request, render_template
 from binance.client import Client
 from binance.enums import *
 
@@ -36,8 +36,8 @@ def order(side, quantity, symbol,order_type=ORDER_TYPE_MARKET):
 #---------------------------------------------------------------------------------
 
 @app.route("/")
-def hello_world():
-    return "Trading Bot Project No.1 (Upload 06/03/2022)"
+def welcome():
+    return render_template('index.html')
 
 #---------------------------------------------------------------------------------
 #---------------------------------------------------------------------------------
