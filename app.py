@@ -63,11 +63,12 @@ def webhook():
         amount = btc_amount
 
     symbol = data['ticker']
+    price = data['bar']['close']
 
     print('passphrase : ',data['passphrase'])
     print('time : ',data['time'])
     print('ticker : ',data['ticker'])
-    print('bar : ',data['bar'])
+    print('bar : ',data['bar']['close'])
     print('side >> ',order_action)
     print('amount >> ',amount)
     print('symbol >> ',symbol)
@@ -81,6 +82,7 @@ def webhook():
             "Symbol" : str(symbol),
             "Action" : str(order_action),
             "Amount" : str(amount),
+            "Price" : data['bar']['close']
         }
     else:
         print("Order Failed")
@@ -89,7 +91,7 @@ def webhook():
             "message" : "Order Failed",
             "Symbol" : str(symbol),
             "Action" : str(order_action),
-            "Amount" : str(amount),
+            "Amount" : str(amount)
         }
 
 
