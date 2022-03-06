@@ -2,3 +2,6 @@ Flask
 gunicorn
 python-binance
 ccxt
+pandas
+math
+decimal
