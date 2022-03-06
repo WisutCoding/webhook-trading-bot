@@ -40,10 +40,10 @@ def webhook():
     df = pd.DataFrame(account_info['balances'])
 
     usdt_info = df.loc[df['asset']== 'USDT']
-    usdt_amount = pd.to_numeric(usdt_info['free'].values[0])*0.9999
+    usdt_amount = round(pd.to_numeric(usdt_info['free'].values[0])*0.99,5)
 
     btc_info = df.loc[df['asset']== 'BTC']
-    btc_amount = pd.to_numeric(btc_info['free'].values[0])*0.9999
+    btc_amount = round(pd.to_numeric(btc_info['free'].values[0])*0.99,5)
 
     #---------------------------------------------------
     # Data from Webhook
