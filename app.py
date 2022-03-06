@@ -60,9 +60,9 @@ def webhook():
     price = data['bar']['close']
     
     if order_action == "BUY":
-        amount = usdt_amount/price
+        amount = 0.0005 # usdt_amount/price
     else:
-        amount = btc_amount
+        amount = 0.0005
 
 
 
