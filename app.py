@@ -91,7 +91,8 @@ def webhook():
             "message" : "Order Failed",
             "Symbol" : str(symbol),
             "Action" : str(order_action),
-            "Amount" : str(amount)
+            "Amount" : str(amount),
+            "Price" : data['bar']['close']
         }
 
 
