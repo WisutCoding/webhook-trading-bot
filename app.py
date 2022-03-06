@@ -72,7 +72,7 @@ def webhook():
     print('amount >> ',amount)
     print('symbol >> ',symbol)
 
-    order_response = order(order_action, btc_amount, symbol)   # Minimum Notional is 20 USD
+    order_response = order(order_action, amount, symbol)   # Minimum Notional is 20 USD
 
     if order_response:
         return {
