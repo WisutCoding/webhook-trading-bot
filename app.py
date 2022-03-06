@@ -37,8 +37,8 @@ def order(side, quantity, symbol,order_type=ORDER_TYPE_MARKET):
 
 @app.route("/")
 def welcome():
-    #return render_template('index.html')
-    return "Hello World"
+    return render_template('index.html')
+    #return "Hello World!"
 
 #---------------------------------------------------------------------------------
 #---------------------------------------------------------------------------------
@@ -102,13 +102,12 @@ def webhook():
 ### Run bot on flask via Heroku
 
 #>- heroku login
-#>- heroku (to See all command for heroku)
+#>- heroku                                  (to See all command for heroku)
 #>- git init
 
 #>- heroku git:remote -a binance-btc-rsi-strategy-1
-#>- git status (Check Status File in Project throught git)
+#>- git status                              (Check Status File in Project throught git)
 
-#>- git add . (add files)
-#>- git commit -am "Commit Description"
-
-#>- git push heroku master (Deploy App to heroku)
+#>- git add .                               (add files)
+#>- git commit -am "Commit Description"     (Tell Server to use new version)
+#>- git push heroku master                  (Deploy App to heroku)
