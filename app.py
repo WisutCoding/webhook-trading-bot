@@ -4,15 +4,15 @@ from flask import Flask, request, render_template
 from binance.client import Client
 from binance.enums import *
 import pandas as pd
-import math
-import decimal
+# import math
+# import decimal
 #---------------------------------------------------------------------------------
 app = Flask(__name__)
 client = Client(config.API_KEY, config.API_SECRET)
 #---------------------------------------------------------------------------------
-def round_down(n, decimals=0):
-    multiplier = 10 ** decimals
-    return math.floor(n * multiplier) / multiplier
+# def round_down(n, decimals=0):
+#     multiplier = 10 ** decimals
+#     return math.floor(n * multiplier) / multiplier
 #---------------------------------------------------------------------------------
 def order(side, quantity, symbol,order_type=ORDER_TYPE_MARKET):
     try:
@@ -40,10 +40,10 @@ def webhook():
     df = pd.DataFrame(account_info['balances'])
 
     usdt_info = df.loc[df['asset']== 'USDT']
-    usdt_amount = round_down(pd.to_numeric(usdt_info['free']),2)
+    usdt_amount = round(pd.to_numeric(usdt_info['free']),2)-0.01
 
     btc_info = df.loc[df['asset']== 'BTC']
-    btc_amount = round_down(pd.to_numeric(btc_info['free']),4)
+    btc_amount = round(pd.to_numeric(btc_info['free']),4)-0.0001
 
     #---------------------------------------------------
     # Data from Webhook

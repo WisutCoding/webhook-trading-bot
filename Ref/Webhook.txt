@@ -1,0 +1,18 @@
+{
+    "passphrase":"abc123",
+    "time":"{{timenow}}",
+    "exchange":"{{exchange}}",
+    "ticker":"{{ticker}}",
+    "bar":{
+        "time":"{{time}}",
+        "open":"{{open}}",
+        "high":"{{high}}",
+        "low":"{{low}}",
+        "close":"{{close}}"
+    },
+    "strategy":{
+        "order_action":"buy",
+        "order_action_2":{{strategy.order.action}},
+        "order_price":{{strategy.order.price}},
+    }
+}
