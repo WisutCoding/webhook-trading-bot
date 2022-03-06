@@ -37,7 +37,7 @@ def order(side, quantity, symbol,order_type=ORDER_TYPE_MARKET):
 
 @app.route("/")
 def hello_world():
-    return "Trading Bot Project"
+    return "Trading Bot Project No.1 (Upload 06/03/2022)"
 
 #---------------------------------------------------------------------------------
 #---------------------------------------------------------------------------------
