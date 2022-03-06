@@ -86,7 +86,10 @@ def webhook():
         print("Order Failed")
         return{
             "code" : "Error",
-            "message" : "Order Failed"
+            "message" : "Order Failed",
+            "Symbol" : str(symbol),
+            "Action" : str(order_action),
+            "Amount" : str(amount),
         }
 
 
