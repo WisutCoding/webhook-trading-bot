@@ -40,7 +40,7 @@ def webhook():
 
     symbol = data['ticker']                                 # Get Symbol
 
-    price = data['bar']['close']                            # Get Close Price
+    price_close = data['bar']['close']                            # Get Close Price
 
     #---------------------------------------------------
     # Check Balance
@@ -60,7 +60,7 @@ def webhook():
 
     bet_ratio = 0.25
 
-    buy_btc_amt = (bet_ratio*usdt_amount/close_price)*100000//1/100000    #>> 0.xxxxx
+    buy_btc_amt = (bet_ratio*usdt_amount/price_close)*100000//1/100000    #>> 0.xxxxx
     sell_btc_amt = (bet_ratio*btc_amount)*100000//1/100000                  #>> 0.xxxxx
 
     # identify BUY/SELL amount
@@ -73,7 +73,7 @@ def webhook():
     print('passphrase : ',data['passphrase'])
     print('time : ',data['time'])
     print('symbol >> ',symbol)
-    print('Price : ',data['bar']['close'])
+    print('Price : ',price_close)
     print('side >> ',order_action)
     print('amount >> ',amount)
 
@@ -86,7 +86,7 @@ def webhook():
             "Symbol" : symbol,
             "Action" : order_action,
             "Amount" : amount,
-            "Price" : data['bar']['close']
+            "Price" : price_close
         }
     else:
         print("Order Failed")
@@ -96,7 +96,7 @@ def webhook():
             "Symbol" : symbol,
             "Action" : order_action,
             "Amount" : amount,
-            "Price" : data['bar']['close']
+            "Price" : price_close
         }
 
 #---------------------------------------------------------------------------------
