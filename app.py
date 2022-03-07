@@ -7,7 +7,6 @@ import pandas as pd
 #---------------------------------------------------------------------------------
 app = Flask(__name__)
 client = Client(config.API_KEY, config.API_SECRET)
-
 #---------------------------------------------------------------------------------
 def order(side, quantity, symbol,order_type=ORDER_TYPE_MARKET):
     try:
@@ -36,13 +35,11 @@ def webhook():
             "message":"invalid passpharse"
         }
     
-    order_action = data['strategy']['order_action'].upper() # Get BUY/SELL
-
     symbol = data['ticker']                                 # Get Symbol
+    price_close = data['bar']['close']                      # Get Close 
 
-    price_close = data['bar']['close']                      # Get Close Price
-
-    bet_ratio = data['bet_ratio']
+    order_action = data['strategy']['order_action'].upper() # Get BUY/SELL
+    bet_ratio = data['bet_ratio']                           # Get bet ratio
 
     #---------------------------------------------------
     # Check Balance
@@ -60,9 +57,7 @@ def webhook():
     #---------------------------------------------------
     # Money Management
 
-    bet_ratio = 0.3
-
-    buy_btc_amt = (bet_ratio*usdt_amount/price_close)*100000//1/100000    #>> 0.xxxxx
+    buy_btc_amt = (bet_ratio*usdt_amount/price_close)*100000//1/100000      #>> 0.xxxxx
     sell_btc_amt = (bet_ratio*btc_amount)*100000//1/100000                  #>> 0.xxxxx
 
     # identify BUY/SELL amount
@@ -85,20 +80,20 @@ def webhook():
         return {
             "code" : "Success",
             "message" : "Order Executed",
-            "Symbol" : symbol,
-            "Action" : order_action,
-            "Amount" : amount,
-            "Price" : price_close
+            "Symbol" : str(symbol),
+            "Action" : str(order_action),
+            "Amount" : str(amount),
+            "Price" : str(price_close)
         }
     else:
         print("Order Failed")
         return{
             "code" : "Error",
             "message" : "Order Failed",
-            "Symbol" : symbol,
-            "Action" : order_action,
-            "Amount" : amount,
-            "Price" : price_close
+            "Symbol" : str(symbol),
+            "Action" : str(order_action),
+            "Amount" : str(amount),
+            "Price" : str(price_close)
         }
 
 #---------------------------------------------------------------------------------
