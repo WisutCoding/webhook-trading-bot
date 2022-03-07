@@ -35,12 +35,10 @@ def webhook():
             "message":"invalid passpharse"
         }
     
-    symbol = data['ticker']                                 # Get Symbol
-    price_close = data['bar']['close']                      # Get Close 
-
-    order_action = data['strategy']['order_action'].upper() # Get BUY/SELL
-    bet_ratio = data['bet_ratio']                           # Get bet ratio
-
+    symbol = data['ticker']                                     # Get Symbol
+    price_close = pd.to_numeric(data['bar']['close'])           # Get Close 
+    order_action = data['strategy']['order_action'].upper()     # Get BUY/SELL
+    
     #---------------------------------------------------
     # Check Balance
 
@@ -49,16 +47,18 @@ def webhook():
     df = pd.DataFrame(account_info['balances'])
 
     usdt_info = df.loc[df['asset'] == 'USDT']
-    usdt_amount = pd.to_numeric(usdt_info['free'].values[0])
-
     btc_info = df.loc[df['asset'] == 'BTC']
+
+    usdt_amount = pd.to_numeric(usdt_info['free'].values[0])
     btc_amount = pd.to_numeric(btc_info['free'].values[0])
 
     #---------------------------------------------------
     # Money Management
+    buy_ratio = pd.to_numeric(data['strategy']['buy_ratio'])    # Get buy ratio > defualt=1
+    sell_ratio = pd.to_numeric(data['strategy']['sell_ratio'])  # Get sell ratio > defualt=1
 
-    buy_btc_amt = (bet_ratio*usdt_amount/price_close)*100000//1/100000      #>> 0.xxxxx
-    sell_btc_amt = (bet_ratio*btc_amount)*100000//1/100000                  #>> 0.xxxxx
+    buy_btc_amt = (buy_ratio*usdt_amount/price_close)*100000//1/100000      #>> convert to 5 decimal point
+    sell_btc_amt = (sell_ratio*btc_amount)*100000//1/100000                 #>> convert to 5 decimal point
 
     # identify BUY/SELL amount
     if order_action == "BUY":
@@ -74,16 +74,16 @@ def webhook():
     print('side >> ',order_action)
     print('amount >> ',amount)
 
-    #order_response = order(order_action, amount, symbol)   # Minimum Notional is 20 USD
+    order_response = order(order_action, amount, symbol)   # Minimum Notional is 20 USD
 
     if order_response:
         return {
             "code" : "Success",
             "message" : "Order Executed",
-            "Symbol" : str(symbol),
-            "Action" : str(order_action),
-            "Amount" : str(amount),
-            "Price" : str(price_close)
+            "Symbol" : symbol,
+            "Action" : order_action,
+            "Amount" : amount,
+            "Price" : price_close
         }
     else:
         print("Order Failed")
