@@ -40,7 +40,9 @@ def webhook():
 
     symbol = data['ticker']                                 # Get Symbol
 
-    price_close = data['bar']['close']                            # Get Close Price
+    price_close = data['bar']['close']                      # Get Close Price
+
+    bet_ratio = data['bet_ratio']
 
     #---------------------------------------------------
     # Check Balance
@@ -49,16 +51,16 @@ def webhook():
 
     df = pd.DataFrame(account_info['balances'])
 
-    usdt_info = df.loc[df['asset']== 'USDT']
+    usdt_info = df.loc[df['asset'] == 'USDT']
     usdt_amount = pd.to_numeric(usdt_info['free'].values[0])
 
-    btc_info = df.loc[df['asset']== 'BTC']
+    btc_info = df.loc[df['asset'] == 'BTC']
     btc_amount = pd.to_numeric(btc_info['free'].values[0])
 
     #---------------------------------------------------
     # Money Management
 
-    bet_ratio = 0.25
+    bet_ratio = 0.3
 
     buy_btc_amt = (bet_ratio*usdt_amount/price_close)*100000//1/100000    #>> 0.xxxxx
     sell_btc_amt = (bet_ratio*btc_amount)*100000//1/100000                  #>> 0.xxxxx
@@ -77,7 +79,7 @@ def webhook():
     print('side >> ',order_action)
     print('amount >> ',amount)
 
-    order_response = order(order_action, amount, symbol)   # Minimum Notional is 20 USD
+    #order_response = order(order_action, amount, symbol)   # Minimum Notional is 20 USD
 
     if order_response:
         return {
