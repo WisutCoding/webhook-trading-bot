@@ -90,7 +90,8 @@ def webhook():
             "Action" : order_action,
             "Amount" : amount,
             "Price" : price_close,
-            "Position Sizing" : Positioning
+            "Position Sizing" : Positioning,
+            "Buy_Aamount_Fixed" : config.BUY_AMOUNT_FIXED
         }
     else:
         print("Order Failed")
