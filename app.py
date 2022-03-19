@@ -64,7 +64,7 @@ def webhook():
     # identify BUY/SELL amount
     if order_action == "BUY":
         if config.POSITION_SIZING == 'FIXED':   # Select Buy Amount Fixed / Account Balance Ratio
-            amount = config.BUY_AMOUNT_FIXED
+            amount = (config.BUY_AMOUNT_FIXED/price_close)*100000//1/100000
         else:
             amount = buy_btc_amt
     else:
