@@ -57,12 +57,16 @@ def webhook():
     buy_ratio = pd.to_numeric(data['strategy']['buy_ratio'])    # Get buy ratio > defualt=1
     sell_ratio = pd.to_numeric(data['strategy']['sell_ratio'])  # Get sell ratio > defualt=1
 
+    # Calculate Order Quantity
     buy_btc_amt = (buy_ratio*usdt_amount/price_close)*100000//1/100000      #>> convert to 5 decimal point
     sell_btc_amt = (sell_ratio*btc_amount)*100000//1/100000                 #>> convert to 5 decimal point
 
     # identify BUY/SELL amount
     if order_action == "BUY":
-        amount = buy_btc_amt
+        if config.POSITION_SIZING == 'FIXED':   # Select Buy Amount Fixed / Account Balance Ratio
+            amount = config.BUY_AMOUNT_FIXED
+        else:
+            amount = buy_btc_amt
     else:
         amount = sell_btc_amt
 
