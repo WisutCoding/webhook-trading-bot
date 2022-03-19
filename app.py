@@ -49,20 +49,22 @@ def webhook():
     usdt_info = df.loc[df['asset'] == 'USDT']
     btc_info = df.loc[df['asset'] == 'BTC']
 
-    usdt_amount = pd.to_numeric(usdt_info['free'].values[0])
+    if config.POSITION_SIZING == 'FIXED':   # Select Buy Amount Fixed / Account Balance Ratio
+        usdt_amount = config.BUY_AMOUNT_FIXED
+        Positioning = "Fixed"
+    else:
+        usdt_amount = pd.to_numeric(usdt_info['free'].values[0])
+        Positioning = "Ratio"
+
     btc_amount = pd.to_numeric(btc_info['free'].values[0])
 
     #---------------------------------------------------
     # Money Management
-
-    if config.POSITION_SIZING == 'FIXED':   # Select Buy Amount Fixed / Account Balance Ratio
-        buy_ratio = config.BUY_AMOUNT_FIXED/usdt_amount
-        Positioning = "Fixed"
-    else:
-        buy_ratio = pd.to_numeric(data['strategy']['buy_ratio'])    # Get buy ratio > defualt=1
-        Positioning = "Ratio"
-
+    buy_ratio = pd.to_numeric(data['strategy']['buy_ratio'])    # Get buy ratio > defualt=1
     sell_ratio = pd.to_numeric(data['strategy']['sell_ratio'])  # Get sell ratio > defualt=1
+
+    buy_btc_amt = (buy_ratio*usdt_amount/price_close)*100000//1/100000      #>> convert to 5 decimal point
+    sell_btc_amt = (sell_ratio*btc_amount)*100000//1/100000                 #>> convert to 5 decimal point
 
     # Calculate Order Quantity
     buy_btc_amt = (buy_ratio*usdt_amount/price_close)*100000//1/100000      #>> convert to 5 decimal point
