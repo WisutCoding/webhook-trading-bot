@@ -7,17 +7,7 @@ import pandas as pd
 #---------------------------------------------------------------------------------
 app = Flask(__name__)
 client = Client(config.API_KEY, config.API_SECRET)
-#---------------------------------------------------------------------------------
-def order(side, quantity, symbol,order_type=ORDER_TYPE_MARKET):
-    try:
-        print(f"sending order {order_type} - {side} {quantity} {symbol}")
-        order = client.create_order(symbol=symbol, side=side, type=order_type, quantity=quantity)
 
-    except Exception as e:
-        print("an exception occured - {}".format(e))
-        return False
-
-    return order
 #---------------------------------------------------------------------------------
 @app.route("/")
 def welcome():
@@ -26,10 +16,11 @@ def welcome():
 #---------------------------------------------------------------------------------
 @app.route('/webhook', methods=['POST'])
 def webhook():
-    #---------------------------------------------------
+    ##########################################################################
     # recieve webhook
     wbhook = json.loads(request.data)
     
+    ##########################################################################
     # get webhook data
 
     passphrase = wbhook['passphrase']
@@ -56,7 +47,7 @@ def webhook():
     trailing_stop_historical_bar = float(wbhook['trailing_stop_historical_bar'])
     trailing_stop_callback_rate = float(wbhook['trailing_stop_callback_rate'])
 
-    #################################################################################################
+    ##########################################################################
     # check user
     if passphrase == config.WEBHOOK_PASSPHRASE_1:
         client = Client(config.API_KEY_1, config.API_SECRET_1)
@@ -68,12 +59,12 @@ def webhook():
         client = "N/A"
         user_no = "N/A"
 
-    #################################################################################################
+    ##########################################################################
     # check account balance
     base_balance = float(my_bnc.check_balance(base_currency, user_no))
     target_balance = float(my_bnc.check_balance(target_symbol, user_no))
 
-    #################################################################################################
+    ##########################################################################
     # get all tick
     all_price = client.get_all_tickers()
     df_all_price = pd.DataFrame(all_price)
@@ -82,7 +73,7 @@ def webhook():
     price = df_all_price[(df_all_price.symbol == symbol)]
     price = float(price['price'])
 
-    #################################################################################################
+    ##########################################################################
     # Position Sizing
     ## BUY
     if buy_fixed_or_ratio == "fixed":
@@ -104,7 +95,7 @@ def webhook():
     else:
         sell_amount = 0
         
-    #################################################################################################
+    ##########################################################################
     # select order amount
 
     if side == "BUY":
@@ -114,11 +105,10 @@ def webhook():
     else:
         order_amount = "N/A"
 
-    #################################################################################################
+    ##########################################################################
     # order execution
 
-    order_response = client.create_order(symbol=symbol, side=side, type=ORDER_TYPE_MARKET, quantity=order_amount) # Minimum Notional is 20 USD
-    print(order_response)
+    order_response = client.create_order(symbol=symbol, side=side, type=ORDER_TYPE_MARKET, quantity=order_amount)
 
     if order_response:
         return {
