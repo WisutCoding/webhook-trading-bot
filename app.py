@@ -1,12 +1,15 @@
-import json
-import config
 from flask import Flask, request, render_template
 from binance.client import Client
 from binance.enums import *
 import pandas as pd
+import json
+
+import config
+import binance_script as my_bnc
 #---------------------------------------------------------------------------------
 app = Flask(__name__)
 client = Client(config.API_KEY, config.API_SECRET)
+
 #---------------------------------------------------------------------------------
 def order(side, quantity, symbol,order_type=ORDER_TYPE_MARKET):
     try:
@@ -18,94 +21,146 @@ def order(side, quantity, symbol,order_type=ORDER_TYPE_MARKET):
         return False
 
     return order
+
 #---------------------------------------------------------------------------------
 @app.route("/")
 def welcome():
     return render_template('index.html')
+
 #---------------------------------------------------------------------------------
 #---------------------------------------------------------------------------------
 @app.route('/webhook', methods=['POST'])
 def webhook():
-    #---------------------------------------------------
-    # Get Webhook
-    data = json.loads(request.data)                         # Get json
-    if data['passphrase'] != config.WEBHOOK_PASSPHRASE:
+
+    #----------------------------------------------------------------------------
+    # recieve Webhook
+    wbhook = json.loads(request.data)
+    
+    if wbhook['passphrase'] != config.WEBHOOK_PASSPHRASE_1:
         return{
-            "code":"error",
-            "message":"invalid passpharse"
+            "invalid passphase"
+        }
+
+    if wbhook['passphrase'] != config.WEBHOOK_PASSPHRASE_2:
+        return{
+            "invalid passphase"
         }
     
-    symbol = data['ticker']                                     # Get Symbol
-    price_close = pd.to_numeric(data['bar']['close'])           # Get Close 
-    order_action = data['strategy']['order_action'].upper()     # Get BUY/SELL
+    # get webhook data
+
+    passphrase = wbhook['passphrase']
+    base_currency = wbhook['base_currency']
+
+    symbol = wbhook['symbol']
+    target_symbol = symbol.split(base_currency)[0]
+
+    side = wbhook['side']
+
+    buy_ratio_percent = float(wbhook['buy_ratio_percent'])
+    buy_fixed_amount_USDT = float(wbhook['buy_fixed_amount_USDT'])
+    buy_fixed_or_ratio = wbhook['buy_fixed_or_ratio']
+
+    sell_ratio_percent = float(wbhook['sell_ratio_percent'])
+    sell_fixed_amount_USDT = float(wbhook['sell_fixed_amount_USDT'])
+    sell_fixed_or_ratio = wbhook['sell_fixed_or_ratio']
+
+    # take_profit_percent = float(wbhook['take_profit_percent'])
+    # stop_loss_percent = float(wbhook['stop_loss_percent'])
+
+    # trailing_stop_Type = wbhook['trailing_stop_(no/historical/callback)']
+    # trailing_stop_activation_percent = float(wbhook['trailing_stop_activation_percent'])
+    # trailing_stop_historical_bar = float(wbhook['trailing_stop_historical_bar'])
+    # trailing_stop_callback_rate = float(wbhook['trailing_stop_callback_rate'])
+
+    # check user
+    if passphrase == config.WEBHOOK_PASSPHRASE_1:
+        client = Client(config.API_KEY_1, config.API_SECRET_1)
+        user_no = 1
+    elif passphrase == config.WEBHOOK_PASSPHRASE_2:
+        client = Client(config.API_KEY_2, config.API_SECRET_2)
+        user_no = 2
+    else:
+        user_no = "N/A"
+
+    # check account balance
+    base_balance = float(my_bnc.check_balance(base_currency, user_no))
+
+    # check account balance (target symbol)
+    target_balance = float(my_bnc.check_balance(target_symbol, user_no))
+
+    #----------------------------------------------------------------------------
+
+    # get all tick
+    all_price = client.get_all_tickers()
+    df_all_price = pd.DataFrame(all_price)
+
+    # check target price
+    price = df_all_price[(df_all_price.symbol == symbol)]
+    price = float(price['price'])
+    price
     
-    #---------------------------------------------------
-    # Check Balance
+    #----------------------------------------------------------------------------
 
-    account_info= client.get_account()
+    # Position Sizing
 
-    df = pd.DataFrame(account_info['balances'])
+    # BUY
 
-    usdt_info = df.loc[df['asset'] == 'USDT']
-    btc_info = df.loc[df['asset'] == 'BTC']
+    if buy_fixed_or_ratio == "fixed":
+        buy_amount = buy_fixed_amount_USDT / price
+        buy_amount
 
-    if config.POSITION_SIZING == 'FIXED':   # Select Buy Amount Fixed / Account Balance Ratio
-        usdt_amount = config.BUY_AMOUNT_FIXED
-        Positioning = "Fixed"
+    elif buy_fixed_or_ratio == "ratio":
+        buy_amount = (base_balance * buy_ratio_percent) / price
+        buy_amount
+
     else:
-        usdt_amount = pd.to_numeric(usdt_info['free'].values[0])
-        Positioning = "Ratio"
+        buy_amount = 0
 
-    btc_amount = pd.to_numeric(btc_info['free'].values[0])
+    # SELL
 
-    #---------------------------------------------------
-    # Money Management
-    buy_ratio = pd.to_numeric(data['strategy']['buy_ratio'])    # Get buy ratio > defualt=1
-    sell_ratio = pd.to_numeric(data['strategy']['sell_ratio'])  # Get sell ratio > defualt=1
+    if sell_fixed_or_ratio == "fixed":
+        sell_amount = sell_fixed_amount_USDT / price
+        sell_amount
 
-    buy_btc_amt = (buy_ratio*usdt_amount/price_close)*100000//1/100000      #>> convert to 5 decimal point
-    sell_btc_amt = (sell_ratio*btc_amount)*100000//1/100000                 #>> convert to 5 decimal point
+    elif sell_fixed_or_ratio == "ratio":
+        sell_amount = (target_balance * sell_ratio_percent) / 100
+        sell_amount
 
-    # Calculate Order Quantity
-    buy_btc_amt = (buy_ratio*usdt_amount/price_close)*100000//1/100000      #>> convert to 5 decimal point
-    sell_btc_amt = (sell_ratio*btc_amount)*100000//1/100000                 #>> convert to 5 decimal point
-
-    # identify BUY/SELL amount
-    if order_action == "BUY":
-        amount = buy_btc_amt
     else:
-        amount = sell_btc_amt
+        sell_amount = 0
 
-    #---------------------------------------------------
-    print('passphrase : ',data['passphrase'])
-    print('time : ',data['time'])
-    print('symbol >> ',symbol)
-    print('Price : ',price_close)
-    print('side >> ',order_action)
-    print('amount >> ',amount)
 
-    order_response = order(order_action, amount, symbol)   # Minimum Notional is 20 USD
+    #----------------------------------------------------------------------------
+
+    # order execution
+
+    if side == "BUY":
+        order_amount = round(buy_amount,5)
+    elif side == "SELL":
+        order_amount = round(sell_amount,5)
+    else:
+        order_amount = "N/A"
+
+    order_response = client.create_order(symbol=symbol, side=side, type=ORDER_TYPE_MARKET, quantity=order_amount)
 
     if order_response:
         return {
             "code" : "Success",
             "message" : "Order Executed",
-            "Symbol" : symbol,
-            "Action" : order_action,
-            "Amount" : amount,
-            "Price" : price_close,
-            "Position Sizing" : Positioning,
-            "Buy_Aamount_Fixed" : config.BUY_AMOUNT_FIXED
+            "symbol" : symbol,
+            "side" : side,
+            "order amount" : order_amount,
+            "price" : price,
         }
     else:
         print("Order Failed")
         return{
             "code" : "Error",
             "message" : "Order Failed",
-            "Symbol" : str(symbol),
-            "Action" : str(order_action),
-            "Amount" : str(amount),
-            "Price" : str(price_close)
+            "symbol" : symbol,
+            "side" : side,
+            "amount" : order_amount,
+            "price" : price,
         }
 
 #---------------------------------------------------------------------------------
