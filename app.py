@@ -9,7 +9,7 @@ app = Flask(__name__)
 client = Client(config.API_KEY, config.API_SECRET)
 
 #---------------------------------------------------------------------------------
-@app.route("/")
+@app.route('/')
 def welcome():
     return render_template('index.html')
 #---------------------------------------------------------------------------------
