@@ -18,7 +18,7 @@ def welcome():
 
 #---------------------------------------------------------------------------------
 
-@app.route('/webhook1', methods=['POST'])
+@app.route('/webhook', methods=['POST'])
 def webhook():
     ##########################################################################
     # recieve webhook
@@ -65,7 +65,7 @@ def webhook():
 
     elif wbhook['passphrase'] == config.WEBHOOK_PASSPHRASE_2:
         client = Client(config.API_KEY_2, config.API_SECRET_2)
-        
+
     else:
         client = "N/A"
 
