@@ -28,7 +28,7 @@ def webhook():
         print("get webhook error - {}".format(e))
         return False
 
-    if wbhook['passphrase'] != config.WEBHOOK_PASSPHRASE_1:
+    if wbhook['passphrase'] != config.WEBHOOK_PASSPHRASE_1 or wbhook['passphrase'] != config.WEBHOOK_PASSPHRASE_2:
         return{"message":"invalid passpharse"}
     
     ##########################################################################
@@ -60,7 +60,14 @@ def webhook():
     ##########################################################################
     # setup client
 
-    client = Client(config.API_KEY_1, config.API_SECRET_1)
+    if wbhook['passphrase'] == config.WEBHOOK_PASSPHRASE_1:
+        client = Client(config.API_KEY_1, config.API_SECRET_1)
+
+    elif wbhook['passphrase'] == config.WEBHOOK_PASSPHRASE_2:
+        client = Client(config.API_KEY_2, config.API_SECRET_2)
+        
+    else:
+        client = "N/A"
 
     ##########################################################################
     # check account balance free
@@ -151,8 +158,6 @@ def webhook():
             "side" : side,
             "amount" : order_amount
         }
-
-    return False
 
 ##################################################################################################################
 ##################################################################################################################
