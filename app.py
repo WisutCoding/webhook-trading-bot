@@ -188,11 +188,10 @@ def webhook():
 #>- heroku                                  (to See all command for heroku)
 #>- git init
 
-#>- heroku git:remote -a binance-btc-rsi-strategy-1
-#>- git status                              (Check Status File in Project throught git)
+#>- git status
 
-#>- git add .                               (add files)
-#>- git commit -am "Commit Description"     (Tell Server to use new version)
-#>- git push heroku master                  (Deploy App to heroku)
+#>- git add .
+#>- git commit -am "Description"
+#>- git push heroku master
 
 #>- heroku logs --tail
