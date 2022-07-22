@@ -129,7 +129,7 @@ def webhook():
 #>- heroku                                  (to See all command for heroku)
 #>- git init
 
-#>- heroku git:remote -a binance-btc-rsi-strategy-1
+#>- heroku git:remote -a xxx
 #>- git status                              (Check Status File in Project throught git)
 
 #>- git add .                               (add files)
