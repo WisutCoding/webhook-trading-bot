@@ -1,9 +1,10 @@
-import json
-import config
 from flask import Flask, request, render_template
 from binance.client import Client
 from binance.enums import *
 import pandas as pd
+import json
+import config
+import binance_script as my_bnc
 #---------------------------------------------------------------------------------
 
 app = Flask(__name__)
