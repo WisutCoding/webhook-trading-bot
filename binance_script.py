@@ -31,7 +31,7 @@ def check_balance(symbol, user):
         df_balance['locked'] = df_account['locked'].astype(float)
 
         df_free = df_balance[df_balance['free']>0]
-        df_free
+
         
         # Select Symbol
         balance_free = pd.to_numeric(df_free['free'].loc[df_free['asset'] == symbol].values[0])

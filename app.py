@@ -8,8 +8,6 @@ import binance_script as my_bnc
 #---------------------------------------------------------------------------------
 
 app = Flask(__name__)
-client_1 = Client(config.API_KEY_1, config.API_SECRET_1)
-client_2 = Client(config.API_KEY_2, config.API_SECRET_2)
 
 #---------------------------------------------------------------------------------
 @app.route('/')
@@ -17,11 +15,15 @@ def welcome():
     return render_template('index.html')
 #---------------------------------------------------------------------------------
 #---------------------------------------------------------------------------------
-@app.route('/webhook', methods=['POST'])
+@app.route('/webhook1', methods=['POST'])
 def webhook():
     ##########################################################################
     # recieve webhook
-    wbhook = json.loads(request.data)
+    try:
+        wbhook = json.loads(request.data)
+    except Exception as e:
+        print("get webhook error - {}".format(e))
+        return False
     
     ##########################################################################
     # get webhook data
@@ -42,30 +44,44 @@ def webhook():
     sell_fixed_amount_USDT = float(wbhook['sell_fixed_amount_USDT'])
     sell_fixed_or_ratio = wbhook['sell_fixed_or_ratio']
 
-    take_profit_percent = float(wbhook['take_profit_percent'])
-    stop_loss_percent = float(wbhook['stop_loss_percent'])
+    # take_profit_percent = float(wbhook['take_profit_percent'])
+    # stop_loss_percent = float(wbhook['stop_loss_percent'])
 
-    trailing_stop_Type = wbhook['trailing_stop_(no/historical/callback)']
-    trailing_stop_activation_percent = float(wbhook['trailing_stop_activation_percent'])
-    trailing_stop_historical_bar = float(wbhook['trailing_stop_historical_bar'])
-    trailing_stop_callback_rate = float(wbhook['trailing_stop_callback_rate'])
-
-    ##########################################################################
-    # check user
-    if passphrase == config.WEBHOOK_PASSPHRASE_1:
-        client = client_1
-        user_no = 1
-    elif passphrase == config.WEBHOOK_PASSPHRASE_2:
-        client = client_2
-        user_no = 2
-    else:
-        client = "N/A"
-        user_no = "N/A"
+    # trailing_stop_Type = wbhook['trailing_stop_(no/historical/callback)']
+    # trailing_stop_activation_percent = float(wbhook['trailing_stop_activation_percent'])
+    # trailing_stop_historical_bar = float(wbhook['trailing_stop_historical_bar'])
+    # trailing_stop_callback_rate = float(wbhook['trailing_stop_callback_rate'])
 
     ##########################################################################
-    # check account balance
-    base_balance = float(my_bnc.check_balance(base_currency, user_no))
-    target_balance = float(my_bnc.check_balance(target_symbol, user_no))
+    # setup client
+
+    client = Client(config.API_KEY_1, config.API_SECRET_1)
+
+    ##########################################################################
+    # check account balance free
+
+    account_info= client.get_account()
+
+    df_account = pd.DataFrame(account_info['balances'])
+
+    df_balance = pd.DataFrame()
+    df_balance['asset'] = df_account['asset'].astype(str)
+    df_balance['free'] = df_account['free'].astype(float)
+    df_balance['locked'] = df_account['locked'].astype(float)
+
+    df_free = df_balance[df_balance['free']>0]
+    
+    # balance free by symbol
+
+    try:
+        base_balance = float(df_free['free'].loc[df_free['asset'] == base_currency])
+    except TypeError:
+        target_balance = 0
+
+    try:
+        target_balance = float(df_free['free'].loc[df_free['asset'] == target_symbol])
+    except TypeError:
+        target_balance = 0
 
     ##########################################################################
     # get all tick
