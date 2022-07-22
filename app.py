@@ -4,7 +4,6 @@ from binance.enums import *
 import pandas as pd
 import json
 import config
-import binance_script as my_bnc
 
 #---------------------------------------------------------------------------------
 
@@ -29,7 +28,10 @@ def webhook():
         return False
 
     if wbhook['passphrase'] != config.WEBHOOK_PASSPHRASE_1 or wbhook['passphrase'] != config.WEBHOOK_PASSPHRASE_2:
-        return{"message":"invalid passpharse"}
+        return{"invalid passphrase":wbhook['passphrase'],
+        "1" : config.WEBHOOK_PASSPHRASE_1,
+        "2" : config.WEBHOOK_PASSPHRASE_2
+        }
     
     ##########################################################################
     # get webhook data
