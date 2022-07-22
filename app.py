@@ -66,7 +66,7 @@ def webhook():
     # trailing_stop_callback_rate = float(wbhook['trailing_stop_callback_rate'])
 
     ##########################################################################
-    # setup client
+    # setup client (multi client)
 
     if wbhook['passphrase'] == config.WEBHOOK_PASSPHRASE_1:
         client = Client(config.API_KEY_1, config.API_SECRET_1)
