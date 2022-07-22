@@ -25,12 +25,18 @@ def webhook():
         wbhook = json.loads(request.data)
     except Exception as e:
         print("get webhook error - {}".format(e))
-        return False
+        return {
+            "code" : "error",
+            "message" : "get webhook error"
+        }
 
-    if wbhook['passphrase'] != config.WEBHOOK_PASSPHRASE_1 or wbhook['passphrase'] != config.WEBHOOK_PASSPHRASE_2:
-        return{"invalid passphrase":wbhook['passphrase'],
-        "1" : config.WEBHOOK_PASSPHRASE_1,
-        "2" : config.WEBHOOK_PASSPHRASE_2
+    if wbhook['passphrase'] == config.WEBHOOK_PASSPHRASE_1 or wbhook['passphrase'] == config.WEBHOOK_PASSPHRASE_2:
+        print("passphrase correct")
+    else:
+        print("order failed")
+        return{
+            "code" : "error",
+            "message" : "passphrase error"
         }
     
     ##########################################################################
@@ -67,7 +73,7 @@ def webhook():
 
     elif wbhook['passphrase'] == config.WEBHOOK_PASSPHRASE_2:
         client = Client(config.API_KEY_2, config.API_SECRET_2)
-
+        
     else:
         client = "N/A"
 
