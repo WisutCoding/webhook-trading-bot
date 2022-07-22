@@ -5,8 +5,10 @@ from binance.client import Client
 from binance.enums import *
 import pandas as pd
 #---------------------------------------------------------------------------------
+
 app = Flask(__name__)
-client = Client(config.API_KEY, config.API_SECRET)
+client_1 = Client(config.API_KEY_1, config.API_SECRET_1)
+client_2 = Client(config.API_KEY_2, config.API_SECRET_2)
 
 #---------------------------------------------------------------------------------
 @app.route('/')
@@ -50,10 +52,10 @@ def webhook():
     ##########################################################################
     # check user
     if passphrase == config.WEBHOOK_PASSPHRASE_1:
-        client = Client(config.API_KEY_1, config.API_SECRET_1)
+        client = client_1
         user_no = 1
     elif passphrase == config.WEBHOOK_PASSPHRASE_2:
-        client = Client(config.API_KEY_2, config.API_SECRET_2)
+        client = client_2
         user_no = 2
     else:
         client = "N/A"
