@@ -158,3 +158,5 @@ def webhook():
 #>- git add .                               (add files)
 #>- git commit -am "Commit Description"     (Tell Server to use new version)
 #>- git push heroku master                  (Deploy App to heroku)
+
+#>- heroku logs --tail
